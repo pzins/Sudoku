@@ -64,8 +64,121 @@ Mat sobel(Mat source)
 }
 
 
+
+int similarity(Mat& _case, Mat& _number)
+{
+    int somme = 0;
+    for(int i = 0; i < _case.size().height; ++i){
+        for(int j = 0; j < _case.size().width; ++j){
+            Scalar caseIntensity = _case.at<uchar>(i,j);
+            Scalar numberIntensity = _number.at<uchar>(i,j);
+            if(std::abs(caseIntensity.val[0] - numberIntensity.val[0]) < 50)
+            {
+                ++somme;
+            }
+        }
+    }
+    return somme;
+}
+
+
+int compute(Mat& _img, int _caseHeight, int _caseWidth, int _x, int _y)
+{
+    Rect roi(2 + _x, 2 + _y, _caseHeight, _caseWidth);
+    //Rect roi(2+_caseWidth*4, 2, _caseHeight, _caseWidth);
+    Mat crop = _img(roi);
+    //imshow("base", crop);
+    int max = 0, id = 0;
+    for(int i = 0; i <= 10; ++i)
+    {
+        std::string filename = "chiffres/" + std::to_string(i) + ".png";
+        Mat filtre = imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
+        resize(filtre, filtre, crop.size());
+        //imshow(std::to_string(i), filtre);
+        int tmp = similarity(crop, filtre);
+        //std::cout << i << " => " << tmp << std::endl;
+        if(tmp > max)
+        {
+            max = tmp;
+            id = i;
+        }
+    }
+    return id;
+}
+
 int main()
 {
+
+
+    Mat img = imread("sudoku.png", CV_LOAD_IMAGE_GRAYSCALE);
+    int caseHeight = img.size().height / 9;
+    int caseWidth = img.size().width / 9;
+
+    int mat[9][9];
+
+    for(int x = 0; x < 9; ++x)
+    {
+        for(int y = 0; y < 9; ++y)
+        {
+            mat[x][y] = compute(img, caseHeight, caseWidth, x * caseWidth, y * caseHeight);
+        }
+    }
+
+
+    for(int i = 0; i < 9; ++i)
+    {
+        for(int j = 0; j < 9; ++j)
+        {
+            std::cout << mat[j][i] << " ";
+        }
+        std::cout << std::endl;
+    }
+    //imshow("crop", crop);
+
+    /*
+    imshow("un", img);
+
+    Mat im(Size(100,100), 0);
+
+    resize(img, im, im.size());
+*/
+
+    waitKey();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*
     int grid[SIZE][SIZE] =
     {
@@ -105,21 +218,23 @@ int main()
     s.print();
     std::cout << t.elapsed() << std::endl;
 */
-    Mat img = imread("sudoku.png", CV_LOAD_IMAGE_GRAYSCALE);
 
+    /*
     for(int i  = 0; i < img.size().height * img.size().width; ++i)
     {
         int p00;
         p00 = img.at<uchar>(i);
         std::cout << p00;
-    }
+    }*/
+    /*
+    for(int i = 0; i < img.size().height; ++i){
+        for(int j = 0; j < img.size().width; ++j){
+            Scalar intensity = img.at<uchar>(i,j);
+            //std::cout << intensity.val[0] << std::endl;
+        }
+    }*/
+    //namedWindow("image", CV_WINDOW_AUTOSIZE);
 
-    namedWindow("image", CV_WINDOW_AUTOSIZE);
-    imshow("image", img);
-    imshow("Sobel", sobel(img)); // Show frame
-    imshow("gauss", gauss(img)); // Show frame
-    imshow("prewitt", prewitt(img)); // Show frame
 
-    waitKey();
     return 0;
 }
