@@ -83,7 +83,7 @@ public:
     bool optIsValid(int position);
     bool megaOptIsValid(int position);
 
-    void import9x9FromFile();
+    void import9x9FromFile(const std::string &_filename);
 };
 
 

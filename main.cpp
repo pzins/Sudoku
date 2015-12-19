@@ -12,24 +12,32 @@ using namespace cv;
 int main()
 {
 
+
+
+
+
+
+
+
     GridRecognizer gr("sudoku.png");
     Grid g(gr.getGrid());
+    cv::waitKey(0);
     gr.exportToFile("export.txt");
 
-
+/*
 
     for(int i = 0; i < 9; ++i)
     {
         for(int j = 0; j < 9; ++j)
         {
-            std::cout << g.at(j).at(i) << " ";
+            std::cout << g.at(i).at(j) << " ";
         }
         std::cout << std::endl;
     }
 
     waitKey();
 
-
+*/
 
 
 /*
@@ -57,20 +65,23 @@ int main()
         {9,0,8,0,0,0,0,0,2},
         {0,0,0,2,0,1,0,6,0}
     };*/
+   /*
+    int a;
+    std::cin >> a;
     SudokuSolver s;
-    s.import9x9FromFile();
+    s.import9x9FromFile("export.txt");
     s.print();
-/*
+
     //s.importGrid(grid);
     s.initQueue();
-    s.print();
-    boost::timer t;
+    //s.print();
+    //boost::timer t;
     s.megaOptIsValid(s.nextVoidCase());
     // s.isValid(0);
     // s.optIsValid(0);
     s.print();
-    std::cout << t.elapsed() << std::endl;
-*/
+    //std::cout << t.elapsed() << std::endl;
+
 
     /*
     for(int i  = 0; i < img.size().height * img.size().width; ++i)

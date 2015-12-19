@@ -56,7 +56,7 @@ void SudokuSolver::print(){
         {
             if(j % DEL == 0)
                 std::cout << " ";
-            std::cout << grid[i][j];
+            std::cout << grid[j][i];
         }
         std::cout << std::endl;
     }
@@ -332,10 +332,10 @@ bool SudokuSolver::megaOptIsValid(int position)
     return false;
 }
 
-void SudokuSolver::import9x9FromFile()
+void SudokuSolver::import9x9FromFile(const std::string& _filename)
 {
     std::string line;
-    std::ifstream myfile ("export.txt");
+    std::ifstream myfile (_filename);
     if (myfile.is_open())
     {
         int l = 0;
