@@ -1,123 +1,10 @@
 #include "sudokuSolver.h"
-
-bool SudokuSolver::checkArea(int _x, int _y)
-{
-    std::set<int> tmp;
-    for(int i = 0; i < DEL; ++i)
-    {
-        for(int j = 0; j < DEL; ++j)
-        {
-            if(!tmp.insert(grid[_x+i][_y+j]).second)
-                return false;
-            //if(grid[x+i][y+j] < 1 || grid[x+i][y+j] > 9)
-            //	return false;
-        }
-    }
-    return true;
-}
-
-int SudokuSolver::countAreaZero(int _x, int _y)
-{
-    int nb = 0;
-    for(int i = 0; i < DEL; ++i)
-    {
-        for(int j = 0; j < DEL; ++j)
-        {
-            if(grid[_x+i][_y+j] == 0)
-                nb++;
-        }
-    }
-    return nb;
-}
-
-
 SudokuSolver::SudokuSolver(){
     for(int i = 0 ; i< SIZE; ++i)
         for(int j = 0; j < SIZE; ++j)
             grid[i][j] = 0;
 }
 
-void SudokuSolver::importGrid(int _grid[SIZE][SIZE])
-{
-    for(int i = 0 ; i < SIZE; ++i)
-    {
-        for(int j = 0; j < SIZE; ++j)
-        {
-            grid[i][j] = _grid[i][j];
-        }
-    }
-}
-void SudokuSolver::print(){
-    for(int i = 0 ; i < SIZE; ++i)
-    {
-        if(i % DEL == 0)
-            std::cout << std::endl;
-        for(int j = 0; j < SIZE; ++j)
-        {
-            if(j % DEL == 0)
-                std::cout << " ";
-            std::cout << grid[j][i];
-        }
-        std::cout << std::endl;
-    }
-}
-
-bool SudokuSolver::checkLine(int n)
-{
-    std::set<int> tmp;
-    for(int j = 0; j < SIZE; ++j){
-        if(!tmp.insert(grid[n][j]).second)
-            return false;
-        //if(grid[n][j] < 1 || grid[n][j] > 9)
-        //	return false;
-    }
-    return true;
-}
-bool SudokuSolver::checkColumn(int n)
-{
-    std::set<int> tmp;
-    for(int i = 0; i < SIZE; ++i){
-        if(!tmp.insert(grid[i][n]).second)
-            return false;
-        //if(grid[i][n] < 1 || grid[i][n] > 9)
-        //	return false;
-    }
-    return true;
-}
-
-bool SudokuSolver::checkSquare(int numero)
-{
-    switch(numero)
-    {
-        case 0:
-            return checkArea(0,0);
-        case 1:
-            return checkArea(0,3);
-        case 2:
-            return checkArea(0,6);
-        case 3:
-            return checkArea(3,0);
-        case 4:
-            return checkArea(3,3);
-        case 5:
-            return checkArea(3,6);
-        case 6:
-            return checkArea(6,0);
-        case 7:
-            return checkArea(6,3);
-        case 8:
-            return checkArea(6,6);
-    }
-}
-
-bool SudokuSolver::hasZero()
-{
-    for(int i = 0 ; i < SIZE; ++i)
-        for(int j = 0 ; j < SIZE; ++j)
-            if(grid[i][j] == 0)
-                return true;
-    return false;
-}
 
 
 void SudokuSolver::initQueue()
@@ -132,82 +19,17 @@ void SudokuSolver::initQueue()
                 c.i = i;
                 c.j = j;
                 file.push(c);
-
             }
         }
     }
 }
+
 int SudokuSolver::nextVoidCase(){
     Case c = file.front();
     file.pop();
     return c.i * SIZE + c.j;
 }
-int SudokuSolver::bestLine()
-{
-    int line = 0, maxZero = 0;
-    for(int i = 0; i < SIZE; ++i)
-    {
-        int nb = 0;
-        for(int j = 0; j < SIZE; ++j)
-        {
-            if(grid[i][j] == 0)
-                ++nb;
-        }
-        if(nb > maxZero)
-        {
-            maxZero = nb;
-            line = i;
-        }
-    }
-    return line;
-}
-//return column number containing most nuymber of zero
-int SudokuSolver::bestColumn()
-{
-    int col = 0, maxZero = 0;
-    for(int j = 0; j < SIZE; ++j)
-    {
-        int nb = 0;
-        for(int i = 0; i < SIZE; ++i)
-        {
-            if(grid[i][j] == 0)
-                ++nb;
-        }
-        if(nb > maxZero)
-        {
-            maxZero = nb;
-            col = j;
-        }
-    }
-    return col;
-}
 
-//return numero of square containing most number of zero
-int SudokuSolver::bestSquare()
-{
-    int res[9];
-    res[0] =  countAreaZero(0,0);
-    res[1] =  countAreaZero(0,3);
-    res[2] =  countAreaZero(0,6);
-    res[3] =  countAreaZero(3,0);
-    res[4] =  countAreaZero(3,3);
-    res[5] =  countAreaZero(3,6);
-    res[6] =  countAreaZero(6,0);
-    res[7] =  countAreaZero(6,3);
-    res[8] =  countAreaZero(6,6);
-    int square = 0, max = 0;
-    for(int i = 0 ; i < 9; ++i)
-    {
-        if(max < res[i])
-        {
-            max = res[i];
-            square = i;
-        }
-    }
-    return square;
-}
-
-//return vector containing every possibilies of a case, input i, j
 std::vector<int> SudokuSolver::possibility(int i, int j)
 {
     bool res[10];
@@ -281,7 +103,6 @@ bool SudokuSolver::isValid(int position)
         }
     }
     grid[i][j] = 0;
-
     return false;
 }
 
@@ -306,6 +127,7 @@ bool SudokuSolver::optIsValid(int position)
 
     return false;
 }
+
 bool SudokuSolver::megaOptIsValid(int position)
 {
     if(position == SIZE*SIZE)
@@ -353,3 +175,185 @@ void SudokuSolver::import9x9FromFile(const std::string& _filename)
         myfile.close();
     }
 }
+
+void SudokuSolver::importGrid(int _grid[SIZE][SIZE])
+{
+    for(int i = 0 ; i < SIZE; ++i)
+    {
+        for(int j = 0; j < SIZE; ++j)
+        {
+            grid[i][j] = _grid[i][j];
+        }
+    }
+}
+
+void SudokuSolver::print(){
+    std::cout << "======================== start ======================" << std::endl;
+    for(int i = 0 ; i < SIZE; ++i)
+    {
+        if(i % DEL == 0)
+            std::cout << std::endl;
+        for(int j = 0; j < SIZE; ++j)
+        {
+            if(j % DEL == 0)
+                std::cout << " ";
+            std::cout << grid[j][i];
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "======================== end =======================" << std::endl;
+}
+
+int SudokuSolver::bestLine()
+{
+    int line = 0, maxZero = 0;
+    for(int i = 0; i < SIZE; ++i)
+    {
+        int nb = 0;
+        for(int j = 0; j < SIZE; ++j)
+        {
+            if(grid[i][j] == 0)
+                ++nb;
+        }
+        if(nb > maxZero)
+        {
+            maxZero = nb;
+            line = i;
+        }
+    }
+    return line;
+}
+int SudokuSolver::bestColumn()
+{
+    int col = 0, maxZero = 0;
+    for(int j = 0; j < SIZE; ++j)
+    {
+        int nb = 0;
+        for(int i = 0; i < SIZE; ++i)
+        {
+            if(grid[i][j] == 0)
+                ++nb;
+        }
+        if(nb > maxZero)
+        {
+            maxZero = nb;
+            col = j;
+        }
+    }
+    return col;
+}
+int SudokuSolver::bestSquare()
+{
+    int res[9];
+    res[0] =  countAreaZero(0,0);
+    res[1] =  countAreaZero(0,3);
+    res[2] =  countAreaZero(0,6);
+    res[3] =  countAreaZero(3,0);
+    res[4] =  countAreaZero(3,3);
+    res[5] =  countAreaZero(3,6);
+    res[6] =  countAreaZero(6,0);
+    res[7] =  countAreaZero(6,3);
+    res[8] =  countAreaZero(6,6);
+    int square = 0, max = 0;
+    for(int i = 0 ; i < 9; ++i)
+    {
+        if(max < res[i])
+        {
+            max = res[i];
+            square = i;
+        }
+    }
+    return square;
+}
+
+
+
+bool SudokuSolver::checkArea(int _x, int _y)
+{
+    std::set<int> tmp;
+    for(int i = 0; i < DEL; ++i)
+    {
+        for(int j = 0; j < DEL; ++j)
+        {
+            if(!tmp.insert(grid[_x+i][_y+j]).second)
+                return false;
+            //if(grid[x+i][y+j] < 1 || grid[x+i][y+j] > 9)
+            //	return false;
+        }
+    }
+    return true;
+}
+
+int SudokuSolver::countAreaZero(int _x, int _y)
+{
+    int nb = 0;
+    for(int i = 0; i < DEL; ++i)
+    {
+        for(int j = 0; j < DEL; ++j)
+        {
+            if(grid[_x+i][_y+j] == 0)
+                nb++;
+        }
+    }
+    return nb;
+}
+
+
+
+bool SudokuSolver::checkLine(int n)
+{
+    std::set<int> tmp;
+    for(int j = 0; j < SIZE; ++j){
+        if(!tmp.insert(grid[n][j]).second)
+            return false;
+        //if(grid[n][j] < 1 || grid[n][j] > 9)
+        //	return false;
+    }
+    return true;
+}
+bool SudokuSolver::checkColumn(int n)
+{
+    std::set<int> tmp;
+    for(int i = 0; i < SIZE; ++i){
+        if(!tmp.insert(grid[i][n]).second)
+            return false;
+        //if(grid[i][n] < 1 || grid[i][n] > 9)
+        //	return false;
+    }
+    return true;
+}
+
+bool SudokuSolver::checkSquare(int numero)
+{
+    switch(numero)
+    {
+        case 0:
+            return checkArea(0,0);
+        case 1:
+            return checkArea(0,3);
+        case 2:
+            return checkArea(0,6);
+        case 3:
+            return checkArea(3,0);
+        case 4:
+            return checkArea(3,3);
+        case 5:
+            return checkArea(3,6);
+        case 6:
+            return checkArea(6,0);
+        case 7:
+            return checkArea(6,3);
+        case 8:
+            return checkArea(6,6);
+    }
+}
+
+bool SudokuSolver::hasZero()
+{
+    for(int i = 0 ; i < SIZE; ++i)
+        for(int j = 0 ; j < SIZE; ++j)
+            if(grid[i][j] == 0)
+                return true;
+    return false;
+}
+

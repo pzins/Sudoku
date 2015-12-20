@@ -6,19 +6,17 @@
 #include "gridRecognizer.h"
 using namespace cv;
 
-
+/*
+ * chiffres1 fonctionnent maintenant
+ * chiffres et fonctionnent pas
+ * voir faire pls tailles de base différentes pr chaque filtre chiffre et faire somme des similarity
+ *
+ * revoir l'ajout de x /3 et y / 3 ds compute pr prendre en compte les traits + gros de la grille
+ */
 
 
 int main()
 {
-
-
-
-
-
-
-
-
     GridRecognizer gr("sudoku.png");
     Grid g(gr.getGrid());
     cv::waitKey(0);
@@ -64,40 +62,24 @@ int main()
         {4,0,0,0,5,0,7,0,0},
         {9,0,8,0,0,0,0,0,2},
         {0,0,0,2,0,1,0,6,0}
-    };*/
-   /*
-    int a;
-    std::cin >> a;
+    };
+*/
+
+
     SudokuSolver s;
     s.import9x9FromFile("export.txt");
     s.print();
 
     //s.importGrid(grid);
-    s.initQueue();
+    //s.initQueue();
     //s.print();
     //boost::timer t;
-    s.megaOptIsValid(s.nextVoidCase());
-    // s.isValid(0);
+    //s.megaOptIsValid(s.nextVoidCase());
+    s.isValid(0);
     // s.optIsValid(0);
     s.print();
     //std::cout << t.elapsed() << std::endl;
 
-
-    /*
-    for(int i  = 0; i < img.size().height * img.size().width; ++i)
-    {
-        int p00;
-        p00 = img.at<uchar>(i);
-        std::cout << p00;
-    }*/
-    /*
-    for(int i = 0; i < img.size().height; ++i){
-        for(int j = 0; j < img.size().width; ++j){
-            Scalar intensity = img.at<uchar>(i,j);
-            //std::cout << intensity.val[0] << std::endl;
-        }
-    }*/
-    //namedWindow("image", CV_WINDOW_AUTOSIZE);
 
 
     return 0;

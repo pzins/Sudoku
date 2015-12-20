@@ -1,6 +1,10 @@
 #include "gridRecognizer.h"
 #include <fstream>
 
+//opencv : at : <rows, line>
+//x => colmuns
+//y => lines
+
 
 GridRecognizer::GridRecognizer(const std::string& _filename) : imageFile(_filename),
     img(cv::imread(_filename, CV_LOAD_IMAGE_GRAYSCALE)), grid(9, Line(9))
@@ -9,26 +13,29 @@ GridRecognizer::GridRecognizer(const std::string& _filename) : imageFile(_filena
 
 }
 
-cv::Mat preCrop(cv::Mat& _img)
+
+
+cv::Mat GridRecognizer::preCrop(cv::Mat _img)
 {
-    int x = _img.size().width * 0.2;
-    int y = _img.size().height * 0.2;
+    int x = _img.size().width * 0.15;
+    int y = _img.size().height * 0.15;
     cv::Rect roi(x, y, _img.size().width - 2 * x, _img.size().height - 2 * y);
     cv::Mat ret = _img(roi);
     return ret;
 }
+
+
 
 Grid GridRecognizer::getGrid()
 {
     int caseHeight = img.size().height / 9;
     int caseWidth = img.size().width / 9;
 
-
     for(int y = 0; y < 9; ++y)
     {
         for(int x = 0; x < 9; ++x)
         {
-            grid[y][x] = compute(img, caseHeight, caseWidth, x * caseWidth, y * caseHeight);
+            grid[y][x] = compute(caseHeight, caseWidth, x * caseWidth + (x/3), y * caseHeight+y/3);
         }
 
     }
@@ -36,9 +43,10 @@ Grid GridRecognizer::getGrid()
 }
 
 
-cv::Mat calibrate(cv::Mat& _img)
+//crop case from outline to have just the number without white border
+cv::Mat GridRecognizer::calibrateFromOutline(cv::Mat& _img)
 {
-    //std::cout << "====================   START CALIBRATE   ===================" << std::endl;
+    //std::cout << "====================   START CALIBRATE 1   ===================" << std::endl;
     int top = 0;
     cv::Scalar intensity ;
     for(int j = 0; j < _img.size().height; ++j)
@@ -114,78 +122,158 @@ cv::Mat calibrate(cv::Mat& _img)
         return _img;
     cv::Rect roi(left, top, right - left+1, bottom - top+1);
     cv::Mat crop = _img(roi);
-    //std::cout << "====================   END CALIBRATE   ===================" << std::endl;
+    //std::cout << "====================   END CALIBRATE 1  ===================" << std::endl;
     return crop;
 }
 
 
-//opencv : at : <rows, line>
-//x => colmuns
-//y => lines
+//crop case from center point to have just the number without white border
+cv::Mat GridRecognizer::calibrateFromCenter(cv::Mat& _img)
+{
+    //std::cout << "====================   START CALIBRATE 2   ===================" << std::endl;
 
-int GridRecognizer::compute(cv::Mat& _img, int _caseHeight, int _caseWidth, int _x, int _y)
+    //define start/end index to eliminate black outline problem
+    float coeff = 0;
+    int beginX = _img.size().width * coeff;
+    int endX = _img.size().width - beginX;
+    int beginY = _img.size().height * coeff;
+    int endY = _img.size ().height - beginY;
+
+
+    int centerX = _img.size().width / 2;
+    int centerY = _img.size().height / 2;
+
+    cv::Scalar intensity;
+    int top = centerY;
+    for(int j = centerY; j >= 0; --j)
+    {
+        bool isVoid = true;
+        for(int i = beginX; i < endX; ++i)
+        {
+            intensity = _img.at<uchar>(j, i);
+            if(intensity.val[0] < 50)
+            {
+                isVoid = false;
+            }
+        }
+        if(isVoid){
+            top = j;
+            break;
+        }
+    }
+    //std::cout << "top = " << top << std::endl;
+
+    int bottom = centerY;
+    for(int j = centerY; j < _img.size().height; ++j)
+    {
+        bool isVoid = true;
+        for(int i = beginX; i < endX; ++i)
+        {
+            intensity = _img.at<uchar>(j, i);
+            if(intensity.val[0] < 50)
+            {
+                isVoid = false;
+            }
+        }
+        if(isVoid){
+            bottom = j;
+            break;
+        }
+    }
+    //std::cout << "bottom = " << bottom << std::endl;
+
+    int left = centerX;
+    for(int i = centerX; i >= 0; --i)
+    {
+        bool isVoid = true;
+        for(int j = beginY; j < endY; ++j)
+        {
+            intensity = _img.at<uchar>(j, i);
+            if(intensity.val[0] < 50)
+            {
+                isVoid = false;
+            }
+        }
+        if(isVoid){
+            left = i;
+            break;
+        }
+    }
+    //std::cout << "left = " << left << std::endl;
+
+    int right = centerX;
+    for(int i = centerX; i < _img.size().width; ++i)
+    {
+        bool isVoid = true;
+        for(int j = beginY; j < endY; ++j)
+        {
+            intensity = _img.at<uchar>(j, i);
+            if(intensity.val[0] < 50)
+            {
+                isVoid = false;
+            }
+        }
+        if(isVoid){
+            right = i;
+            break;
+        }
+    }
+    //std::cout << "right = " << right << std::endl;
+
+    if(top == centerY && bottom == centerY && left == centerX && right == centerX)
+        return _img;
+    cv::Rect roi(left, top, right - left+1, bottom - top+1);
+    cv::Mat crop = _img(roi);
+    //std::cout << "====================   END CALIBRATE 2   ===================" << std::endl;
+    return crop;
+
+}
+
+
+int GridRecognizer::compute(int _caseHeight, int _caseWidth, int _x, int _y)
 {
     cv::Rect roi(_x, _y, _caseWidth, _caseHeight);
-    cv::Mat cropTemp = _img(roi);
-
-
-    cv::Mat tmp = preCrop(cropTemp);
-    cv::Mat result = calibrate(tmp);
-    cv::Scalar intensity ;
-
-    /*
-    if(_y == 6 * _caseHeight)
-    {
-        std::cout << _x << " / " << _y << std::endl;
-        cv::imshow(std::to_string(_x) + "a", cropTemp);
-        cv::imshow(std::to_string(_x) + "b", tmp);
-        cv::imshow(std::to_string(_x), result);
-
-    }
-    */
-
-    /*
-    std::cout << "==========================================" << std::endl;
-    for(int j = 0; j < result.size().height; ++j)
-    {
-        for(int i = 0; i < result.size().width; ++i)
-        {
-            intensity = result.at<uchar>(j,i);
-            std::cout << intensity.val[0] << " ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << "==========================================" << std::endl;
-    */
-    //cv::waitKey(0);
-
-    cv::Mat crop = result;
+    cv::Mat singleCase = preCrop(img(roi));
+    cv::Mat croppedCase = calibrateFromCenter(singleCase);
+    cv::Scalar intensity;
+    //cv::imshow(std::to_string(_x) + std::to_string(_y), singleCase);
+    //cv::imshow(std::to_string(_x) + std::to_string(_y)+"_cropped", croppedCase);
+    //cv::waitKey()
 
     int max = 0, id = 0;
     for(int i = 0; i < 10; ++i)
     {
         std::string filename = "chiffres/" + std::to_string(i) + ".png";
-        cv::Mat filtre = cv::imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
-        cv::resize(filtre, filtre, crop.size());
-        int tmp = similarity(crop, filtre);
+        cv::Mat filter = cv::imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
+        cv::resize(filter, filter, croppedCase.size(), cv::INTER_LANCZOS4);//others options possible for resize see doc
+        int tmp = similarity(croppedCase, filter);
         if(tmp > max)
         {
             max = tmp;
             id = i;
         }
+        //std::cout << i << " => " << tmp << std::endl;
     }
+
+    //cv::waitKey();
+    //cv::destroyWindow(std::to_string(_x) + std::to_string(_y)+"_cropped");
     return id;
+
 }
 
 
-int GridRecognizer::similarity(cv::Mat& _case, cv::Mat& _number)
+int GridRecognizer::similarity(cv::Mat& _croppedCase, cv::Mat& _filter)
 {
+    //cv::imshow("filtre", _filter);
+    //cv::imshow("case", _croppedCase);
+    //cv::waitKey();
     int somme = 0;
-    for(int i = 0; i < _case.size().height; ++i){
-        for(int j = 0; j < _case.size().width; ++j){
-            cv::Scalar caseIntensity = _case.at<uchar>(i,j);
-            cv::Scalar numberIntensity = _number.at<uchar>(i,j);
-            if(std::abs(caseIntensity.val[0] - numberIntensity.val[0]) < 50)
+    for(int j = 0; j < _croppedCase.size().height; ++j){
+        for(int i = 0; i < _croppedCase.size().width; ++i){
+            cv::Scalar caseIntensity = _croppedCase.at<uchar>(j,i);
+            cv::Scalar numberIntensity = _filter.at<uchar>(j,i);
+            if(std::abs(caseIntensity.val[0] - numberIntensity.val[0]) < 50 && caseIntensity.val[0] < 10
+                    && numberIntensity.val[0] < 10)
                 ++somme;
         }
     }
@@ -199,7 +287,6 @@ void GridRecognizer::exportToFile(const std::string &_filename)
     myfile.open (_filename);
     for(auto i : grid)
     {
-
         std::stringstream ss;
         for(auto j : i)
         {
@@ -211,4 +298,17 @@ void GridRecognizer::exportToFile(const std::string &_filename)
         myfile << '\n';
     }
     myfile.close();
+}
+
+void GridRecognizer::printMat(cv::Mat& _m) const
+{
+    for(int j = 0; j < _m.size().height; ++j)
+    {
+        for(int i = 0; i < _m.size().width; ++i)
+        {
+            cv::Scalar intensity = _m.at<uchar>(j,i);
+            std::cout <<  intensity.val[0] << " ";
+        }
+        std::cout << std::endl;
+    }
 }
