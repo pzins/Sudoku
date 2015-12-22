@@ -241,20 +241,27 @@ int GridRecognizer::compute(int _caseHeight, int _caseWidth, int _x, int _y)
     //cv::waitKey()
 
     int max = 0, id = 0;
+    std::cout << "======  " << _x/_caseWidth << "    " << _y/_caseHeight << "==========" << std::endl;
+    //if(_x/_caseWidth == 8 && _y/_caseHeight == 4)
+    //    cv::imshow("ol", croppedCase);
     for(int i = 0; i < 10; ++i)
     {
-        std::string filename = "chiffres/" + std::to_string(i) + ".png";
-        cv::Mat filter = cv::imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
-        cv::resize(filter, filter, croppedCase.size(), cv::INTER_LANCZOS4);//others options possible for resize see doc
-        int tmp = similarity(croppedCase, filter);
+        int tmp = 0;
+        for(int j = 0; j < 4; ++j)
+        {
+            std::string filename = "chiffres/" + std::to_string(i) + "_" + std::to_string(j) + ".png";
+            cv::Mat filter = cv::imread(filename, CV_LOAD_IMAGE_GRAYSCALE);
+            cv::resize(filter, filter, croppedCase.size(), cv::INTER_LANCZOS4);//others options possible for resize see doc
+            tmp += similarity(croppedCase, filter);
+        }
         if(tmp > max)
         {
             max = tmp;
             id = i;
         }
-        //std::cout << i << " => " << tmp << std::endl;
+        std::cout << i << " => " << tmp << std::endl;
     }
-
+    std::cout << "============END=============" << std::endl;
     //cv::waitKey();
     //cv::destroyWindow(std::to_string(_x) + std::to_string(_y)+"_cropped");
     return id;
@@ -272,7 +279,7 @@ int GridRecognizer::similarity(cv::Mat& _croppedCase, cv::Mat& _filter)
         for(int i = 0; i < _croppedCase.size().width; ++i){
             cv::Scalar caseIntensity = _croppedCase.at<uchar>(j,i);
             cv::Scalar numberIntensity = _filter.at<uchar>(j,i);
-            if(std::abs(caseIntensity.val[0] - numberIntensity.val[0]) < 50 && caseIntensity.val[0] < 10
+            if(std::abs(caseIntensity.val[0] - numberIntensity.val[0]) < 5 && caseIntensity.val[0] < 10
                     && numberIntensity.val[0] < 10)
                 ++somme;
         }
