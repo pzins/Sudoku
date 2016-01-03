@@ -8,14 +8,17 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 aux_source_directory(. SRC_LIST)
 
 
+include_directories(../tess_install/include)
+
 file(
     GLOB_RECURSE
     files
     *.h
     *.cpp
 )
-
+SET(CMAKE_INSTALL_RPATH "/home/pierre/Dev/tess_install/lib")
 
 find_package( OpenCV REQUIRED )
 add_executable( Sudoku ${files})
-target_link_libraries( Sudoku ${OpenCV_LIBS} )
+target_link_libraries( Sudoku ${OpenCV_LIBS} lept)
+target_link_libraries( Sudoku /home/pierre/Dev/tess_install/lib/libtesseract.so)
