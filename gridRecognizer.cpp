@@ -34,19 +34,20 @@ int OCR(const std::string& _filename)
 }
 
 
-GridRecognizer::GridRecognizer(const std::string& _filename) : imageFile(_filename),
-    img(cv::imread(_filename, CV_LOAD_IMAGE_GRAYSCALE)), grid(9, Line(9))
+GridRecognizer::GridRecognizer(const std::string& _filename, unsigned int _size) : imageFile(_filename),
+    img(cv::imread(_filename, CV_LOAD_IMAGE_GRAYSCALE)), grid(_size, Line(_size))
 {
 }
 
 Grid GridRecognizer::getGrid()
 {
-    int caseHeight = img.size().height / 9;
-    int caseWidth = img.size().width / 9;
+    int size = grid.size();
+    int caseHeight = img.size().height / size;
+    int caseWidth = img.size().width / size;
 
-    for(int y = 0; y < 9; ++y)
+    for(int y = 0; y < size; ++y)
     {
-        for(int x = 0; x < 9; ++x)
+        for(int x = 0; x < size; ++x)
         {
             grid[y][x] = compute(caseHeight, caseWidth, x * caseWidth , y * caseHeight);
         }
@@ -61,14 +62,15 @@ int GridRecognizer::compute(int _caseHeight, int _caseWidth, int _x, int _y)
 {
     cv::Rect roi(_x, _y, _caseWidth, _caseHeight);
     cv::Mat out = img(roi);
-    //cv::imshow("out", out);
-    //cv::waitKey();
+    cv::imshow("out", out);
+    cv::waitKey();
     cv::imwrite( "tmp.jpg", out);
     //cv::Mat in;
     //cv::resize(out, in, cv::Size(0,0), 10, 10);
     //cv::imwrite( std::to_string(_x) + std::to_string(_y) + ".jpg", in);
     //cv::imwrite( std::to_string(_x) + std::to_string(_y) + ".jpg", out);
-    int ret = OCR("tmp.jpg") ;
+    int ret = OCR("tmp.jpg");
+    std::cout << ">>>>>>>>>>>><  " << ret << std::endl;
     return ret;
 }
 

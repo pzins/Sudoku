@@ -14,19 +14,21 @@ using namespace cv;
  * revoir l'ajout de x /3 et y / 3 ds compute pr prendre en compte les traits + gros de la grille
  *
  * enlever les constantes 9 pr nimporte quelle taille de départ
+ * ajouter une fct qui test la validité d'un sudoku pr afficher erreur avant tte action
  */
-
+/*
+ * dernier TRUC:  probleme encore pour utiliser TESSERACT!!!!!!!!!
+ * */
 
 int main()
 {
-    GridRecognizer gr("s5.png");
+    GridRecognizer gr("s5.png", 9);
     Grid g(gr.getGrid());
-    cv::waitKey(0);
     gr.exportToFile("export.txt");
 
 
     SudokuSolver s;
-    s.import9x9FromFile("export.txt");
+    s.importGridFromFile("export.txt");
     s.print();
 
     //s.importGrid(grid);
@@ -34,7 +36,8 @@ int main()
     //s.print();
     //boost::timer t;
     //s.megaOptIsValid(s.nextVoidCase());
-    s.isValid(0);
+    //s.isValid(0);
+    s.hideExceptOne();
     // s.optIsValid(0);
     s.print();
     //std::cout << t.elapsed() << std::endl;

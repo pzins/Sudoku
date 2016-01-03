@@ -6,7 +6,8 @@
 #include <fstream>
 #include <string>
 #define SIZE 9
-#define DEL 3
+#define B_HEIGHT 3
+#define B_WIDTH 3
 
 /**
 	i => lines : 0 - 8
@@ -85,10 +86,16 @@ public:
 
 
 
+    void foundNumbers(std::vector<std::vector<int>>& _foundPositions);
+    void hideExceptOne();
+
+
+
+
     //import export
 
     //import grid from file
-    void import9x9FromFile(const std::string &_filename);
+    void importGridFromFile(const std::string &_filename);
 
     //import grid from array int[GRID][GRID]
     void importGrid(int _grid[SIZE][SIZE]);

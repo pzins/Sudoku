@@ -1,4 +1,5 @@
 #include "sudokuSolver.h"
+
 SudokuSolver::SudokuSolver(){
     for(int i = 0 ; i< SIZE; ++i)
         for(int j = 0; j < SIZE; ++j)
@@ -41,10 +42,10 @@ std::vector<int> SudokuSolver::possibility(int i, int j)
         res[grid[i][a]] = false;
         res[grid[a][j]] = false;
     }
-    int startLine = (i / DEL)*3;
-    int startCol = (j / DEL)*3;
-    for(int a = 0; a < DEL; ++a)
-        for(int b = 0; b < DEL; ++b)
+    int startLine = (i / B_HEIGHT)*3;
+    int startCol = (j / B_WIDTH)*3;
+    for(int a = 0; a < B_HEIGHT; ++a)
+        for(int b = 0; b < B_WIDTH; ++b)
             res[grid[startLine+a][startCol+b]] = false;
     std::vector<int> v;
     for(int a = 1; a < 10; ++a)
@@ -74,9 +75,9 @@ bool SudokuSolver::isPresentCol(int v, int c)
 }
 bool SudokuSolver::isPresentBloc(int v, int x, int y)
 {
-    int x_bloc = 3*(x/3), y_bloc = 3*(y/3);
-    for(int i = 0; i < 3; ++i)
-        for(int j = 0; j < 3; ++j)
+    int x_bloc = B_HEIGHT*(x/B_HEIGHT), y_bloc = B_WIDTH*(y/B_WIDTH);
+    for(int i = 0; i < SIZE / B_HEIGHT; ++i)
+        for(int j = 0; j < SIZE / B_WIDTH; ++j)
             if(grid[x_bloc+i][y_bloc+j] == v)
                 return true;
     return false;
@@ -106,6 +107,70 @@ bool SudokuSolver::isValid(int position)
     return false;
 }
 
+void SudokuSolver::foundNumbers(std::vector<std::vector<int>>& _foundPositions)
+{
+    for(int i = 0; i < SIZE; ++i)
+    {
+        for(int j = 0; j < SIZE; ++j)
+        {
+            std::cout << "/*/*/*  " << grid[i][j] << std::endl;
+            if(grid[i][j] != 0)
+            {
+                _foundPositions.push_back({i, j});
+                std::cout << "olollololopdfhmgioj" << std::endl;
+            }
+        }
+    }
+}
+
+
+bool contains(std::vector<std::vector<int>>& _stockage, int _x, int _y)
+{
+    for(auto i : _stockage)
+    {
+        if(i.at(0) == _x && i.at(1) == _y)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void SudokuSolver::hideExceptOne()
+{
+    srand (time(NULL));
+    std::vector<std::vector<int>> positions;
+    foundNumbers(positions);
+    isValid(0);
+    int x,y;
+    do
+    {
+        x = rand() % SIZE;
+        y = rand() % SIZE;
+
+    }while(contains(positions, x, y));
+    positions.push_back({x, y});
+    print();
+    std::cout << positions.size() << std::endl;
+    /*
+    for(int i = 0; i < SIZE; ++i)
+    {
+        for(int j = 0; j < SIZE; ++j)
+        {
+            if(!contains(positions, i, j))
+            {
+                grid[i][j] = 0;
+            }
+        }
+    }*/
+
+
+
+}
+
+
+
+//**********************************************************************************************************************
 bool SudokuSolver::optIsValid(int position)
 {
     if(position == SIZE*SIZE)
@@ -154,7 +219,7 @@ bool SudokuSolver::megaOptIsValid(int position)
     return false;
 }
 
-void SudokuSolver::import9x9FromFile(const std::string& _filename)
+void SudokuSolver::importGridFromFile(const std::string& _filename)
 {
     std::string line;
     std::ifstream myfile (_filename);
@@ -174,6 +239,8 @@ void SudokuSolver::import9x9FromFile(const std::string& _filename)
         }
         myfile.close();
     }
+    std::cout << "%%%%%%%%%%%%%%%%%%%" << std::endl;
+    print();
 }
 
 void SudokuSolver::importGrid(int _grid[SIZE][SIZE])
@@ -191,11 +258,11 @@ void SudokuSolver::print(){
     std::cout << "======================== start ======================" << std::endl;
     for(int i = 0 ; i < SIZE; ++i)
     {
-        if(i % DEL == 0)
+        if(i % B_HEIGHT == 0)
             std::cout << std::endl;
         for(int j = 0; j < SIZE; ++j)
         {
-            if(j % DEL == 0)
+            if(j % B_WIDTH == 0)
                 std::cout << " ";
             std::cout << grid[j][i];
         }
@@ -271,9 +338,9 @@ int SudokuSolver::bestSquare()
 bool SudokuSolver::checkArea(int _x, int _y)
 {
     std::set<int> tmp;
-    for(int i = 0; i < DEL; ++i)
+    for(int i = 0; i < B_HEIGHT; ++i)
     {
-        for(int j = 0; j < DEL; ++j)
+        for(int j = 0; j < B_WIDTH; ++j)
         {
             if(!tmp.insert(grid[_x+i][_y+j]).second)
                 return false;
@@ -287,9 +354,9 @@ bool SudokuSolver::checkArea(int _x, int _y)
 int SudokuSolver::countAreaZero(int _x, int _y)
 {
     int nb = 0;
-    for(int i = 0; i < DEL; ++i)
+    for(int i = 0; i < B_HEIGHT; ++i)
     {
-        for(int j = 0; j < DEL; ++j)
+        for(int j = 0; j < B_WIDTH; ++j)
         {
             if(grid[_x+i][_y+j] == 0)
                 nb++;

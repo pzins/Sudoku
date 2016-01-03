@@ -17,32 +17,22 @@ private:
     const std::string imageFile;
     cv::Mat img;
     Grid grid;
-    cv::Mat preCrop(cv::Mat _img); //const à add
-    void printMat(cv::Mat& _m) const;
+
+
 
 
 public:
-    GridRecognizer(const std::string& _filename);
+    GridRecognizer(const std::string& _filename, unsigned int _size);
 
+    void printMat(cv::Mat& _m) const;
     Grid getGrid();
     int compute(int _caseHeight, int _caseWidth, int _x, int _y);
 
-    int similarity(cv::Mat& _croppedCase, cv::Mat& _filter);
-    cv::Mat calibrateFromOutline(cv::Mat& _img);
-    cv::Mat calibrateFromCenter(cv::Mat& _img);//const static??
+
     void exportToFile(const std::string& _filename);
 
 
-
-
-
-
-
-
-
-
 };
-
 
 
 
