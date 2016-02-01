@@ -20,6 +20,7 @@ int OCR(const std::string& _filename)
         exit(1);
     }
     // Open input image with leptonica library
+    api->SetPageSegMode(tesseract::PageSegMode::PSM_SINGLE_CHAR);
     Pix *image = pixRead(_filename.c_str());
     api->SetImage(image);
     // Get OCR result
@@ -27,8 +28,9 @@ int OCR(const std::string& _filename)
     // Destroy used object and release memory
     api->End();
     std::string tmp = outText;
+    std::cout << "##  " << outText << std::endl;
     int ret = std::atoi(outText);
-    delete [] outText;
+    delete outText;
     pixDestroy(&image);
     return ret;
 }
