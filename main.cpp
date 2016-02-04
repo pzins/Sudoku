@@ -22,11 +22,11 @@ using namespace cv;
 
 int main()
 {
-    GridRecognizer gr("s5.png", 9);
+    GridRecognizer gr("sudoku.png", 9);
     Grid g(gr.getGrid());
     gr.exportToFile("export.txt");
 
-
+/*
     SudokuSolver s;
     s.importGridFromFile("export.txt");
     s.print();
@@ -41,7 +41,7 @@ int main()
     // s.optIsValid(0);
     s.print();
     //std::cout << t.elapsed() << std::endl;
-
+*/
 
 
     return 0;

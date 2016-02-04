@@ -31,7 +31,7 @@ int OCR(const std::string& _filename)
     // Destroy used object and release memory
     api->End();
     std::string tmp = outText;
-    std::cout << "##  " << outText << std::endl;
+    //std::cout << "##  " << outText << std::endl;
     int ret = std::atoi(outText);
     delete outText;
     pixDestroy(&image);
@@ -44,79 +44,77 @@ GridRecognizer::GridRecognizer(const std::string& _filename, unsigned int _size)
 {
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
 
-cv::Mat thresh(cv::Mat img)
+
+//find contours
+//hough
+
+void GridRecognizer::detectLine()
 {
-    cv::Mat s = img.clone();
-    cv::adaptiveThreshold(img, s, 255,
-                                   CV_ADAPTIVE_THRESH_GAUSSIAN_C,
-                                   CV_THRESH_BINARY_INV, 101, 1);
-    /*
-    cv::Mat out = img.clone();
-    cv::cvtColor(img,out,CV_BGR2GRAY);
-    cv::Mat img_t=cv::Mat::zeros(img.size(),CV_8UC3);
-    cv::adaptiveThreshold(out,img_t,255,cv::ADAPTIVE_THRESH_MEAN_C,cv::THRESH_BINARY_INV,5,10);*/
-    return s;
-}
-
-cv::Mat grid_extract(cv::Mat img)
-{
-  int index;
-  double max;
-  cv::Mat grid;
-  grid=cv::Mat::zeros(img.size(),CV_8UC1);
-  std::vector<std::vector<cv::Point> > contour;
-  std::vector<cv::Vec4i> h;
-  std::vector<cv::Point> req;
-
-  cv::findContours(img,contour,h,CV_RETR_TREE,CV_CHAIN_APPROX_SIMPLE,cv::Point(0,0));
-  max=cv::contourArea(contour[0]);
-  for(int i=0;i<contour.size();i++)
-  {
-    double temp;
-    temp=cv::contourArea(contour[i]);
-    if(max<temp)
+    for(int i = 0; i < img.size().width; ++i)
     {
-      max=temp;
-      index=i;
-      req=contour[i];
-    }
-  }
-  //cv::drawContours(grid,contour,index,cv::Scalar(255,255,255),CV_FILLED,8,h);
-  cv::namedWindow("Grid",0);
-  cv::imshow("Grid",grid);
-  cv::waitKey(0);
-  return grid(cv::boundingRect(req));
-}
+        int isLine = true;
+        double mean = 0;
 
-//Function to remove the lines from the grid(To seperate out digits from the grid)
-cv::Mat hough(cv::Mat img)
-{
-    std::vector<cv::Vec4i> lines;
-    cv::HoughLinesP(img,lines,1,CV_PI/180,100,30,10);
-    for(int i=0; i<lines.size();i++)
-    {
-        cv::Vec4i l=lines[i];
-        cv::line(img,cv::Point(l[0],l[1]),cv::Point(l[2],l[3]),cv::Scalar(0,0,0),10,CV_AA);
+        for(int j = 0; j < img.size().height; ++j)
+        {
+            if(img.at<uchar>(j,i) < 50)
+            {
+//                isLine = false;
+//                break;
+                ++mean;
+            }
+        }
+//        if(isLine)
+        if(mean / img.size().height > 0.3)
+        {
+            for(int j = 0; j < img.size().height; ++j)
+            {
+                img.at<uchar>(j,i) = 255;
+            }
+        }
+
     }
-    cv::imshow("Digits",img);
-    cv::waitKey(0);
-    return img;
+
+    for(int j = 0; j < img.size().height; ++j)
+    {
+        double mean = 0;
+        for(int i = 0; i < img.size().width; ++i)
+        {
+            if(img.at<uchar>(j,i) < 50)
+            {
+                ++mean;
+            }
+        }
+        if(mean / img.size().width > 0.2)
+        {
+            for(int i = 0; i < img.size().width; ++i)
+            {
+                img.at<uchar>(j,i) = 255;
+            }
+        }
+
+    }
+    cv::imshow("ol", img);
+    cv::imwrite("lyon.png", img);
+    cv::waitKey();
 }
 
 
 Grid GridRecognizer::getGrid()
 {
+    cv::Mat out = img.clone();
+    cv::adaptiveThreshold(out, img, 255,
+                                   CV_ADAPTIVE_THRESH_MEAN_C,
+                                   CV_THRESH_BINARY, 3, 1);
+    cv::imshow("ololol", img);
+    cv::waitKey();
+    detectLine();
     int size = grid.size();
     int caseHeight = img.size().height / size;
     int caseWidth = img.size().width / size;
 
-    cv::imshow("ol", grid_extract(thresh(img)));
-    cv::waitKey();
-    //hough(grid_extract(thresh(img)));
-    /*
+
     for(int y = 0; y < size; ++y)
     {
         for(int x = 0; x < size; ++x)
@@ -124,7 +122,7 @@ Grid GridRecognizer::getGrid()
             grid[y][x] = compute(caseHeight, caseWidth, x * caseWidth , y * caseHeight);
         }
 
-    }*/
+    }
     return grid;
 }
 
@@ -137,15 +135,15 @@ Grid GridRecognizer::getGrid()
 
 int GridRecognizer::compute(int _caseHeight, int _caseWidth, int _x, int _y)
 {
-    cv::Rect roi(_x+20, _y+20, _caseWidth-20, _caseHeight-20);
+    cv::Rect roi(_x, _y, _caseWidth, _caseHeight);
     cv::Mat out = img(roi);
     cv::Mat sudoku_th = out.clone();
     cv::adaptiveThreshold(out, sudoku_th, 255,
                                    CV_ADAPTIVE_THRESH_GAUSSIAN_C,
                                    CV_THRESH_BINARY_INV, 101, 1);
-    cv::imshow("out", sudoku_th);
-    cv::waitKey();
-    cv::imwrite( "tmp.jpg", out);
+//    cv::imshow("out", sudoku_th);
+//    cv::waitKey();
+//    cv::imwrite( "tmp.jpg", out);
 
 
 
