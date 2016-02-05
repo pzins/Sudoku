@@ -88,7 +88,7 @@ public:
 
     void foundNumbers(std::vector<std::vector<int>>& _foundPositions);
     void hideExceptOne();
-
+    bool isFilled() const;
 
 
 
@@ -103,12 +103,9 @@ public:
     //print grid
     void print();
 
-
-
-
-
-
-
+    int getValue(int i, int j){
+        return grid[i][j];
+    }
 
 };
 

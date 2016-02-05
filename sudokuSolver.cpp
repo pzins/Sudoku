@@ -113,11 +113,9 @@ void SudokuSolver::foundNumbers(std::vector<std::vector<int>>& _foundPositions)
     {
         for(int j = 0; j < SIZE; ++j)
         {
-            std::cout << "/*/*/*  " << grid[i][j] << std::endl;
             if(grid[i][j] != 0)
             {
                 _foundPositions.push_back({i, j});
-                std::cout << "olollololopdfhmgioj" << std::endl;
             }
         }
     }
@@ -152,7 +150,7 @@ void SudokuSolver::hideExceptOne()
     positions.push_back({x, y});
     print();
     std::cout << positions.size() << std::endl;
-    /*
+
     for(int i = 0; i < SIZE; ++i)
     {
         for(int j = 0; j < SIZE; ++j)
@@ -162,10 +160,20 @@ void SudokuSolver::hideExceptOne()
                 grid[i][j] = 0;
             }
         }
-    }*/
+    }
+}
 
-
-
+bool SudokuSolver::isFilled() const
+{
+    for(int i = 0; i < 9; ++i)
+    {
+        for(int j = 0; j < 9; ++j)
+        {
+            if(grid[i][j] == 0)
+                return false;
+        }
+    }
+    return true;
 }
 
 
@@ -239,7 +247,6 @@ void SudokuSolver::importGridFromFile(const std::string& _filename)
         }
         myfile.close();
     }
-    std::cout << "%%%%%%%%%%%%%%%%%%%" << std::endl;
     print();
 }
 

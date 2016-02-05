@@ -25,6 +25,8 @@ public:
     GridRecognizer(const std::string& _filename, unsigned int _size);
 
     void detectLine();
+    void color();
+
 
     void printMat(cv::Mat& _m) const;
     Grid getGrid();

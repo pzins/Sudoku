@@ -23,7 +23,7 @@ int OCR(const std::string& _filename)
     api->SetVariable("tessedit_char_whitelist", "0123456789");
 
     // Open input image with leptonica library
-    api->SetPageSegMode(tesseract::PageSegMode::PSM_SINGLE_CHAR);
+    //api->SetPageSegMode(tesseract::PageSegMode::PSM_SINGLE_CHAR);
     Pix *image = pixRead(_filename.c_str());
     api->SetImage(image);
     // Get OCR result
@@ -46,27 +46,31 @@ GridRecognizer::GridRecognizer(const std::string& _filename, unsigned int _size)
 
 
 
-//find contours
-//hough
-
 void GridRecognizer::detectLine()
 {
     for(int i = 0; i < img.size().width; ++i)
     {
         int isLine = true;
         double mean = 0;
-
+        int successive = 0;
         for(int j = 0; j < img.size().height; ++j)
         {
-            if(img.at<uchar>(j,i) < 50)
+            if(img.at<uchar>(j,i) < 100)
             {
-//                isLine = false;
-//                break;
                 ++mean;
+                ++successive;
+            }
+            else
+            {
+                successive = 0;
+            }
+            if(successive > img.size().height / 9)
+            {
+                successive = -1;
+                break;
             }
         }
-//        if(isLine)
-        if(mean / img.size().height > 0.3)
+        if(mean / img.size().height > 0.5 || successive == -1)
         {
             for(int j = 0; j < img.size().height; ++j)
             {
@@ -75,18 +79,28 @@ void GridRecognizer::detectLine()
         }
 
     }
-
     for(int j = 0; j < img.size().height; ++j)
     {
+        int successive = 0;
         double mean = 0;
         for(int i = 0; i < img.size().width; ++i)
         {
-            if(img.at<uchar>(j,i) < 50)
+            if(img.at<uchar>(j,i) < 100)
             {
                 ++mean;
+                ++successive;
+            }
+            else
+            {
+                successive = 0;
+            }
+            if(successive > img.size().width / 9)
+            {
+                successive = -1;
+                break;
             }
         }
-        if(mean / img.size().width > 0.2)
+        if(mean / img.size().width > 0.5 || successive == -1)
         {
             for(int i = 0; i < img.size().width; ++i)
             {
@@ -95,20 +109,36 @@ void GridRecognizer::detectLine()
         }
 
     }
-    cv::imshow("ol", img);
-    cv::imwrite("lyon.png", img);
-    cv::waitKey();
+//    cv::imshow("ol", img);
+//    cv::imwrite("lyon.png", img);
+//    cv::waitKey();
+}
+
+void GridRecognizer::color()
+{
+    for(int j = 0; j < img.size().height; ++j)
+    {
+        for(int i = 0; i < img.size().width; ++i)
+        {
+            if(img.at<uchar>(j,i) < 230)
+            {
+                img.at<uchar>(j,i) = 0;
+            }
+            else
+            {
+                img.at<uchar>(j,i) = 255;
+            }
+
+        }
+    }
 }
 
 
 Grid GridRecognizer::getGrid()
 {
-    cv::Mat out = img.clone();
-    cv::adaptiveThreshold(out, img, 255,
-                                   CV_ADAPTIVE_THRESH_MEAN_C,
-                                   CV_THRESH_BINARY, 3, 1);
-    cv::imshow("ololol", img);
-    cv::waitKey();
+    color();
+//    cv::imshow("ololol", img);
+//    cv::waitKey();
     detectLine();
     int size = grid.size();
     int caseHeight = img.size().height / size;
@@ -143,18 +173,12 @@ int GridRecognizer::compute(int _caseHeight, int _caseWidth, int _x, int _y)
                                    CV_THRESH_BINARY_INV, 101, 1);
 //    cv::imshow("out", sudoku_th);
 //    cv::waitKey();
-//    cv::imwrite( "tmp.jpg", out);
+    cv::imwrite( "tmp.jpg", out);
 
 
 
-
-
-    //cv::Mat in;
-    //cv::resize(out, in, cv::Size(0,0), 10, 10);
-    //cv::imwrite( std::to_string(_x) + std::to_string(_y) + ".jpg", in);
-    //cv::imwrite( std::to_string(_x) + std::to_string(_y) + ".jpg", out);
     int ret = OCR("tmp.jpg");
-    std::cout << ">>>>>>>>>>>><  " << ret << std::endl;
+//    std::cout << ">>>>>>>>>>>><  " << ret << std::endl;
     return ret;
 }
 

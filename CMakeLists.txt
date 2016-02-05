@@ -8,6 +8,15 @@ set(CMAKE_CXX_FLAGS "-std=c++11")
 aux_source_directory(. SRC_LIST)
 
 
+
+set(CMAKE_PREFIX_PATH $ENV{HOME}/Qt5.5.0/5.5/gcc_64)
+find_package(Qt5Widgets)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+qt5_wrap_ui(ui_files mainwindow.ui)
+
+
+
 include_directories(../tess_install/include)
 
 file(
@@ -15,6 +24,7 @@ file(
     files
     *.h
     *.cpp
+    *.ui
 )
 SET(CMAKE_INSTALL_RPATH "/home/pierre/Dev/tess_install/lib")
 
@@ -22,3 +32,5 @@ find_package( OpenCV REQUIRED )
 add_executable( Sudoku ${files})
 target_link_libraries( Sudoku ${OpenCV_LIBS} lept)
 target_link_libraries( Sudoku /home/pierre/Dev/tess_install/lib/libtesseract.so)
+target_link_libraries(Sudoku Qt5::Widgets)
+

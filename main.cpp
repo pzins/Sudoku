@@ -4,6 +4,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include "sudokuSolver.h"
 #include "gridRecognizer.h"
+#include <QApplication>
+#include "mainwindow.h"
 using namespace cv;
 
 /*
@@ -20,16 +22,15 @@ using namespace cv;
  * dernier TRUC:  probleme encore pour utiliser TESSERACT!!!!!!!!!
  * */
 
-int main()
+int main(int argc, char *argv[])
 {
-    GridRecognizer gr("sudoku.png", 9);
+    GridRecognizer gr("s5.png", 9);
     Grid g(gr.getGrid());
     gr.exportToFile("export.txt");
 
-/*
+
     SudokuSolver s;
     s.importGridFromFile("export.txt");
-    s.print();
 
     //s.importGrid(grid);
     //s.initQueue();
@@ -37,12 +38,30 @@ int main()
     //boost::timer t;
     //s.megaOptIsValid(s.nextVoidCase());
     //s.isValid(0);
-    s.hideExceptOne();
+    //s.hideExceptOne();
+    //s.print();
     // s.optIsValid(0);
-    s.print();
     //std::cout << t.elapsed() << std::endl;
-*/
 
 
-    return 0;
+    QApplication a(argc, argv);
+    MainWindow win(s);
+
+
+    win.show();
+    return a.exec();
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
