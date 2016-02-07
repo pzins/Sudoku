@@ -17,7 +17,7 @@ qt5_wrap_ui(ui_files mainwindow.ui)
 
 
 
-include_directories(../tess_install/include)
+include_directories(../tess_build/include)
 
 file(
     GLOB_RECURSE
@@ -31,6 +31,5 @@ SET(CMAKE_INSTALL_RPATH "/home/pierre/Dev/tess_install/lib")
 find_package( OpenCV REQUIRED )
 add_executable( Sudoku ${files})
 target_link_libraries( Sudoku ${OpenCV_LIBS} lept)
-target_link_libraries( Sudoku /home/pierre/Dev/tess_install/lib/libtesseract.so)
+target_link_libraries( Sudoku /home/pierre/Dev/tess_build/lib/libtesseract.so)
 target_link_libraries(Sudoku Qt5::Widgets)
-

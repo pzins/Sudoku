@@ -14,7 +14,7 @@ using Line = std::vector<int>;
 class GridRecognizer
 {
 private:
-    const std::string imageFile;
+    std::string imageFile;
     cv::Mat img;
     Grid grid;
 
@@ -22,7 +22,10 @@ private:
 
 
 public:
-    GridRecognizer(const std::string& _filename, unsigned int _size);
+    GridRecognizer(const std::string& _filename);
+    GridRecognizer();
+
+    void setFilename(const std::string& _filename){imageFile = _filename;}
 
     void detectLine();
     void color();

@@ -161,6 +161,7 @@ void SudokuSolver::hideExceptOne()
             }
         }
     }
+    notify();
 }
 
 bool SudokuSolver::isFilled() const
@@ -176,7 +177,12 @@ bool SudokuSolver::isFilled() const
     return true;
 }
 
-
+bool SudokuSolver::solve()
+{
+    bool ret = isValid(0);
+    notify();
+    return ret;
+}
 
 //**********************************************************************************************************************
 bool SudokuSolver::optIsValid(int position)
@@ -248,6 +254,7 @@ void SudokuSolver::importGridFromFile(const std::string& _filename)
         myfile.close();
     }
     print();
+    notify();
 }
 
 void SudokuSolver::importGrid(int _grid[SIZE][SIZE])

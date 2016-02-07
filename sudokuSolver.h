@@ -5,6 +5,8 @@
 #include <queue>
 #include <fstream>
 #include <string>
+#include "Subject.h"
+
 #define SIZE 9
 #define B_HEIGHT 3
 #define B_WIDTH 3
@@ -20,7 +22,7 @@ struct Case
 	int j;
 };
 
-class SudokuSolver
+class SudokuSolver : public Subject
 {
 private:
 	int grid[SIZE][SIZE];
@@ -57,6 +59,19 @@ private:
     std::vector<int> possibility(int i, int j);
 
 
+    //simple recursice fct to solve sudoku (use isPresentLine, isPresentCol and isPresentBloc)
+    //test all number (1->9)
+    bool isValid(int position);
+
+    //optim version of isValid()
+    //test only possible number (not 1-9)
+    bool optIsValid(int position);
+
+    //optim version of optIsValid()
+    //use a queue to put every empty case
+    //not sure very useful
+    bool megaOptIsValid(int position);
+
 public:
 
     SudokuSolver();
@@ -71,20 +86,9 @@ public:
     bool isPresentCol(int v, int c);
     bool isPresentBloc(int v, int x, int y);
 
-    //simple recursice fct to solve sudoku (use isPresentLine, isPresentCol and isPresentBloc)
-    //test all number (1->9)
-    bool isValid(int position);
-
-    //optim version of isValid()
-    //test only possible number (not 1-9)
-    bool optIsValid(int position);
-
-    //optim version of optIsValid()
-    //use a queue to put every empty case
-    //not sure very useful
-    bool megaOptIsValid(int position);
 
 
+    bool solve();
 
     void foundNumbers(std::vector<std::vector<int>>& _foundPositions);
     void hideExceptOne();

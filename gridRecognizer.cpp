@@ -14,7 +14,6 @@ int OCR(const std::string& _filename)
 {
     char *outText;
     tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
-    api->Init(NULL, "fra");
     if (api->Init(NULL, "fra")) {
         fprintf(stderr, "Could not initialize tesseract.\n");
         exit(1);
@@ -24,6 +23,7 @@ int OCR(const std::string& _filename)
 
     // Open input image with leptonica library
     //api->SetPageSegMode(tesseract::PageSegMode::PSM_SINGLE_CHAR);
+
     Pix *image = pixRead(_filename.c_str());
     api->SetImage(image);
     // Get OCR result
@@ -39,9 +39,12 @@ int OCR(const std::string& _filename)
 }
 
 
-GridRecognizer::GridRecognizer(const std::string& _filename, unsigned int _size) : imageFile(_filename),
-    img(cv::imread(_filename, CV_LOAD_IMAGE_GRAYSCALE)), grid(_size, Line(_size))
+GridRecognizer::GridRecognizer(const std::string& _filename) : imageFile(_filename),
+    img(cv::imread(_filename, CV_LOAD_IMAGE_GRAYSCALE)), grid(9, Line(9))
 {
+}
+GridRecognizer::GridRecognizer() : grid(9, Line(9)){
+
 }
 
 
@@ -136,6 +139,7 @@ void GridRecognizer::color()
 
 Grid GridRecognizer::getGrid()
 {
+    img = cv::imread(imageFile, CV_LOAD_IMAGE_GRAYSCALE);
     color();
 //    cv::imshow("ololol", img);
 //    cv::waitKey();

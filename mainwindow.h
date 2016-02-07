@@ -7,29 +7,32 @@
 #include <QTableWidgetItem>
 #include <QPushButton>
 #include <QLabel>
+#include "Observer.h"
+#include "gridRecognizer.h"
 
 namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, public Observer
 {
     Q_OBJECT
 private:
     Ui::MainWindow *ui;
-    QTableWidget* grid;
+    QTableWidget grid;
+    GridRecognizer gridReognizer;
     SudokuSolver sudoku;
     QTableWidgetItem items[9][9];
-    QPushButton helpButton;
-    QPushButton solve;
-    QLabel end;
 
 public:
-    explicit MainWindow(SudokuSolver& solver, QWidget *parent=0);
+    explicit MainWindow(QWidget *parent=0);
     ~MainWindow();
     void update();
+    void setSudokuSolver(SudokuSolver& _solver);
+    SudokuSolver* getSudokuSolver(){return &sudoku;}
 
 public slots:
+    void loadFile();
     void needHelp();
     void solveSudoku();
 
