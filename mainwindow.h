@@ -17,19 +17,24 @@ class MainWindow;
 class MainWindow : public QMainWindow, public Observer
 {
     Q_OBJECT
-private:
-    Ui::MainWindow *ui;
-    QTableWidget grid;
-    GridRecognizer gridReognizer;
-    SudokuSolver sudoku;
-    QTableWidgetItem items[9][9];
 
 public:
     explicit MainWindow(QWidget *parent=0);
     ~MainWindow();
+    SudokuSolver* getSudokuSolver(){return &sudoku;}
+
+
+private:
+    Ui::MainWindow *ui;
+    QTableWidget grid;
+    QTableWidgetItem items[9][9];
+
+    GridRecognizer gridReognizer;
+    SudokuSolver sudoku;
+
+
     void update();
     void setSudokuSolver(SudokuSolver& _solver);
-    SudokuSolver* getSudokuSolver(){return &sudoku;}
 
 public slots:
     void loadFile();

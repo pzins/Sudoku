@@ -27,7 +27,8 @@ class SudokuSolver : public Subject
 private:
 	int grid[SIZE][SIZE];
 
-	std::queue<Case> file;
+
+    std::queue<Case> file;
 
     //check if line n is correct (no doublon 1<=x<=9)
     bool checkLine(int n);
@@ -85,8 +86,6 @@ public:
     bool isPresentLine(int v, int l);
     bool isPresentCol(int v, int c);
     bool isPresentBloc(int v, int x, int y);
-
-
 
     bool solve();
 

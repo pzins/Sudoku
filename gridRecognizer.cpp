@@ -8,7 +8,7 @@
 //y => lines
 //opencv : at : <rows, col>
 //x => colmuns
-
+#define THRESHOLDCOLOR 230
 
 int OCR(const std::string& _filename)
 {
@@ -18,12 +18,10 @@ int OCR(const std::string& _filename)
         fprintf(stderr, "Could not initialize tesseract.\n");
         exit(1);
     }
-
-    api->SetVariable("tessedit_char_whitelist", "0123456789");
-
-    // Open input image with leptonica library
+    //api->SetVariable("tessedit_char_whitelist", "0123456789");
     //api->SetPageSegMode(tesseract::PageSegMode::PSM_SINGLE_CHAR);
 
+    // Open input image with leptonica library
     Pix *image = pixRead(_filename.c_str());
     api->SetImage(image);
     // Get OCR result
@@ -43,13 +41,20 @@ GridRecognizer::GridRecognizer(const std::string& _filename) : imageFile(_filena
     img(cv::imread(_filename, CV_LOAD_IMAGE_GRAYSCALE)), grid(9, Line(9))
 {
 }
-GridRecognizer::GridRecognizer() : grid(9, Line(9)){
 
+GridRecognizer::GridRecognizer() : grid(9, Line(9))
+{
+}
+
+void GridRecognizer::setFilename(const std::string& _filename)
+{
+    imageFile = _filename;
 }
 
 
 
-void GridRecognizer::detectLine()
+
+void GridRecognizer::removeGrid()
 {
     for(int i = 0; i < img.size().width; ++i)
     {
@@ -110,20 +115,16 @@ void GridRecognizer::detectLine()
                 img.at<uchar>(j,i) = 255;
             }
         }
-
     }
-//    cv::imshow("ol", img);
-//    cv::imwrite("lyon.png", img);
-//    cv::waitKey();
 }
 
-void GridRecognizer::color()
+void GridRecognizer::thresholdColor()
 {
     for(int j = 0; j < img.size().height; ++j)
     {
         for(int i = 0; i < img.size().width; ++i)
         {
-            if(img.at<uchar>(j,i) < 230)
+            if(img.at<uchar>(j,i) < THRESHOLDCOLOR)
             {
                 img.at<uchar>(j,i) = 0;
             }
@@ -137,13 +138,11 @@ void GridRecognizer::color()
 }
 
 
-Grid GridRecognizer::getGrid()
+Grid GridRecognizer::extractGrid()
 {
     img = cv::imread(imageFile, CV_LOAD_IMAGE_GRAYSCALE);
-    color();
-//    cv::imshow("ololol", img);
-//    cv::waitKey();
-    detectLine();
+    thresholdColor();
+    removeGrid();
     int size = grid.size();
     int caseHeight = img.size().height / size;
     int caseWidth = img.size().width / size;
@@ -161,32 +160,14 @@ Grid GridRecognizer::getGrid()
 }
 
 
-
-
-
-
-
-
 int GridRecognizer::compute(int _caseHeight, int _caseWidth, int _x, int _y)
 {
     cv::Rect roi(_x, _y, _caseWidth, _caseHeight);
     cv::Mat out = img(roi);
-    cv::Mat sudoku_th = out.clone();
-    cv::adaptiveThreshold(out, sudoku_th, 255,
-                                   CV_ADAPTIVE_THRESH_GAUSSIAN_C,
-                                   CV_THRESH_BINARY_INV, 101, 1);
-//    cv::imshow("out", sudoku_th);
-//    cv::waitKey();
     cv::imwrite( "tmp.jpg", out);
-
-
-
     int ret = OCR("tmp.jpg");
-//    std::cout << ">>>>>>>>>>>><  " << ret << std::endl;
     return ret;
 }
-
-
 
 //other tool functions
 

@@ -13,15 +13,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-
-
     ui->verticalLayout->insertWidget(0, &grid);
-    //ui->verticalLayout->setAlignment(&grid, Qt::AlignTop);
-    ui->verticalLayout->setAlignment(ui->resultLabel, Qt::AlignBottom);
+
     grid.setColumnCount(9);
     grid.setRowCount(9);
-    grid.setGeometry(20,20,460,460);
     grid.horizontalHeader()->hide();
     grid.verticalHeader()->hide();
     for(int i = 0; i < 9; ++i)
@@ -29,24 +24,29 @@ MainWindow::MainWindow(QWidget *parent) :
         grid.setRowHeight(i,50);
         grid.setColumnWidth(i, 50);
     }
+
+    QObject::connect(ui->helpButton, SIGNAL(clicked()), this, SLOT(needHelp())) ;
+    QObject::connect(ui->solveButton, SIGNAL(clicked()), this, SLOT(solveSudoku())) ;
+    QObject::connect(ui->fileButton, SIGNAL(clicked()), this, SLOT(loadFile())) ;
+
+
+    ui->resultLabel->setVisible(false);
+    ui->resultLabel->setText("SOLVED");
+
+}
+
+void MainWindow::update()
+{
     for(int i = 0; i < 9; ++i)
     {
         for(int j = 0; j < 9; ++j)
         {
-            grid.setItem(i, j, &items[i][j]);
+            items[i][j].setTextAlignment(Qt::AlignCenter);
+            items[i][j].setText(QString::fromStdString(std::to_string(sudoku.getValue(j, i))));
         }
     }
-    QObject::connect(ui->helpButton, SIGNAL(clicked()), this, SLOT(needHelp())) ;
-
-    QObject::connect(ui->solveButton, SIGNAL(clicked()), this, SLOT(solveSudoku())) ;
-    QObject::connect(ui->fileButton, SIGNAL(clicked()), this, SLOT(loadFile())) ;
-
-    QImage image("s5.png");
-
-    ui->imageLabel->setPixmap(QPixmap::fromImage(image.scaled(250,250)));
-
-    ui->resultLabel->setVisible(false);
-    ui->resultLabel->setText("SOLVED");
+    if(sudoku.isFilled())
+        ui->resultLabel->setVisible(true);
 
 }
 
@@ -55,6 +55,14 @@ void MainWindow::setSudokuSolver(SudokuSolver &_solver)
     sudoku = _solver;
 }
 
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+
+/** =========== SLOTS ============= **/
 void MainWindow::needHelp()
 {
     sudoku.hideExceptOne();
@@ -73,31 +81,16 @@ void MainWindow::loadFile()
 
     if (dialog.exec())
     {
-        gridReognizer.setFilename(dialog.selectedFiles().at(0).toStdString());
-        gridReognizer.getGrid();
+        std::string filename = dialog.selectedFiles().at(0).toStdString();
+        gridReognizer.setFilename(filename);
+        gridReognizer.extractGrid();
 
         gridReognizer.exportToFile("export");
         sudoku.importGridFromFile("export");
+        QImage image(filename.c_str());
+
+        ui->imageLabel->setPixmap(QPixmap::fromImage(image.scaled(250,250)));
     }
 
 }
 
-void MainWindow::update()
-{
-    for(int i = 0; i < 9; ++i)
-    {
-        for(int j = 0; j < 9; ++j)
-        {
-            items[i][j].setTextAlignment(Qt::AlignCenter);
-            items[i][j].setText(QString::fromStdString(std::to_string(sudoku.getValue(i, j))));
-        }
-    }
-    if(sudoku.isFilled())
-        ui->resultLabel->setVisible(true);
-
-}
-
-MainWindow::~MainWindow()
-{
-    delete ui;
-}

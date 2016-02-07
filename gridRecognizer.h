@@ -13,31 +13,22 @@ using Line = std::vector<int>;
 
 class GridRecognizer
 {
+
+public:
+    GridRecognizer();
+    GridRecognizer(const std::string& _filename);
+    void setFilename(const std::string& _filename);
+    Grid extractGrid();
+    void printMat(cv::Mat& _m) const;
+    void exportToFile(const std::string& _filename);
+
 private:
     std::string imageFile;
     cv::Mat img;
     Grid grid;
-
-
-
-
-public:
-    GridRecognizer(const std::string& _filename);
-    GridRecognizer();
-
-    void setFilename(const std::string& _filename){imageFile = _filename;}
-
-    void detectLine();
-    void color();
-
-
-    void printMat(cv::Mat& _m) const;
-    Grid getGrid();
+    void removeGrid();
+    void thresholdColor();
     int compute(int _caseHeight, int _caseWidth, int _x, int _y);
-
-
-    void exportToFile(const std::string& _filename);
-
 
 };
 
