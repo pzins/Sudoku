@@ -229,7 +229,6 @@ bool SudokuSolver::megaOptIsValid(int position)
     c.i = i;
     c.j = j;
     file.push(c);
-
     return false;
 }
 

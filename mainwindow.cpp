@@ -25,6 +25,10 @@ MainWindow::MainWindow(QWidget *parent) :
         grid.setColumnWidth(i, 50);
     }
 
+    for(int i = 0; i < 9; i++)
+        for(int j = 0; j < 9; ++j)
+            grid.setItem(i,j, &items[i][j]);
+
     QObject::connect(ui->helpButton, SIGNAL(clicked()), this, SLOT(needHelp())) ;
     QObject::connect(ui->solveButton, SIGNAL(clicked()), this, SLOT(solveSudoku())) ;
     QObject::connect(ui->fileButton, SIGNAL(clicked()), this, SLOT(loadFile())) ;
@@ -82,10 +86,10 @@ void MainWindow::loadFile()
     if (dialog.exec())
     {
         std::string filename = dialog.selectedFiles().at(0).toStdString();
-        gridReognizer.setFilename(filename);
-        gridReognizer.extractGrid();
+        gridRecognizer.setFilename(filename);
+        gridRecognizer.extractGrid();
 
-        gridReognizer.exportToFile("export");
+        gridRecognizer.exportToFile("export");
         sudoku.importGridFromFile("export");
         QImage image(filename.c_str());
 

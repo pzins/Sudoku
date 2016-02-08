@@ -132,7 +132,6 @@ void GridRecognizer::thresholdColor()
             {
                 img.at<uchar>(j,i) = 255;
             }
-
         }
     }
 }

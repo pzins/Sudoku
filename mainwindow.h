@@ -29,7 +29,7 @@ private:
     QTableWidget grid;
     QTableWidgetItem items[9][9];
 
-    GridRecognizer gridReognizer;
+    GridRecognizer gridRecognizer;
     SudokuSolver sudoku;
 
 
