@@ -63,13 +63,15 @@ void GridRecognizer::removeGrid()
         int successive = 0;
         for(int j = 0; j < img.size().height; ++j)
         {
-            if(img.at<uchar>(j,i) < 100)
+            if(img.at<uchar>(i, j) < THRESHOLDCOLOR)
             {
+                img.at<uchar>(i, j) = 0;
                 ++mean;
                 ++successive;
             }
             else
             {
+                img.at<uchar>(i, j) = 255;
                 successive = 0;
             }
             if(successive > img.size().height / 9)
@@ -140,8 +142,10 @@ void GridRecognizer::thresholdColor()
 Grid GridRecognizer::extractGrid()
 {
     img = cv::imread(imageFile, CV_LOAD_IMAGE_GRAYSCALE);
-    thresholdColor();
+    //thresholdColor();
     removeGrid();
+    cv::imshow("ol", grid);
+    cv::waitKey();
     int size = grid.size();
     int caseHeight = img.size().height / size;
     int caseWidth = img.size().width / size;

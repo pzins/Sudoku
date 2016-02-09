@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     return a.exec();
 
 }
-
+//pour lancer : ne pas oublié le path au data des langues : export TESSDATA_PREFIX=/home/pierre/Dev/tess_build/share/
 
 /**
   tesseract a besoin de libtenocia
