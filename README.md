@@ -1,8 +1,8 @@
 #Sudoku Solver
 
-Load file : choose image file and extract the grid
-Solve : solve Sudoku
-Help : give one solution (one random number from all numbers which were not yet found)
+* Load file : choose image file and extract the grid
+* Solve : solve Sudoku
+* Help : give one solution (one random number from all numbers which were not yet found)
 
 
 Dependencies
