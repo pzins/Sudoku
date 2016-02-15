@@ -16,7 +16,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 qt5_wrap_ui(ui_files mainwindow.ui)
 
 
-
+#PATH to include folder of build directory of tesseract
 include_directories(../tess_build/include)
 
 file(
@@ -26,10 +26,10 @@ file(
     *.cpp
     *.ui
 )
-SET(CMAKE_INSTALL_RPATH "/home/pierre/Dev/tess_install/lib")
-
 find_package( OpenCV REQUIRED )
 add_executable( Sudoku ${files})
 target_link_libraries( Sudoku ${OpenCV_LIBS} lept)
+
+#PATH to libtesseract.so : in build folder of tesseract
 target_link_libraries( Sudoku /home/pierre/Dev/tess_build/lib/libtesseract.so)
 target_link_libraries(Sudoku Qt5::Widgets)
