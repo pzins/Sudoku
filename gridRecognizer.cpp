@@ -10,20 +10,26 @@
 //x => colmuns
 #define THRESHOLDCOLOR 230
 
-int OCR(const std::string& _filename)
+int GridRecognizer::OCR(const std::string& _filename, cv::Mat& _img)
 {
-    char *outText;
+
+     char *outText;
     tesseract::TessBaseAPI *api = new tesseract::TessBaseAPI();
     if (api->Init(NULL, "fra")) {
         fprintf(stderr, "Could not initialize tesseract.\n");
         exit(1);
     }
+    api->TesseractRect(_img.data, 1, _img.step1(), 0, 0, _img.cols, _img.rows);
+
+    //method by reading img file
+    /**
     //api->SetVariable("tessedit_char_whitelist", "0123456789");
     //api->SetPageSegMode(tesseract::PageSegMode::PSM_SINGLE_CHAR);
-
     // Open input image with leptonica library
-    Pix *image = pixRead(_filename.c_str());
-    api->SetImage(image);
+    //Pix *image = pixRead(_filename.c_str());
+    //api->SetImage(image);
+    **/
+
     // Get OCR result
     outText = api->GetUTF8Text();
     // Destroy used object and release memory
@@ -32,7 +38,7 @@ int OCR(const std::string& _filename)
     //std::cout << "##  " << outText << std::endl;
     int ret = std::atoi(outText);
     delete outText;
-    pixDestroy(&image);
+    //pixDestroy(&image);
     return ret;
 }
 
@@ -120,23 +126,6 @@ void GridRecognizer::removeGrid()
     }
 }
 
-void GridRecognizer::thresholdColor()
-{
-    for(int j = 0; j < img.size().height; ++j)
-    {
-        for(int i = 0; i < img.size().width; ++i)
-        {
-            if(img.at<uchar>(j,i) < THRESHOLDCOLOR)
-            {
-                img.at<uchar>(j,i) = 0;
-            }
-            else
-            {
-                img.at<uchar>(j,i) = 255;
-            }
-        }
-    }
-}
 
 
 Grid GridRecognizer::extractGrid()
@@ -144,8 +133,7 @@ Grid GridRecognizer::extractGrid()
     img = cv::imread(imageFile, CV_LOAD_IMAGE_GRAYSCALE);
     //thresholdColor();
     removeGrid();
-    cv::imshow("ol", grid);
-    cv::waitKey();
+
     int size = grid.size();
     int caseHeight = img.size().height / size;
     int caseWidth = img.size().width / size;
@@ -167,8 +155,8 @@ int GridRecognizer::compute(int _caseHeight, int _caseWidth, int _x, int _y)
 {
     cv::Rect roi(_x, _y, _caseWidth, _caseHeight);
     cv::Mat out = img(roi);
-    cv::imwrite( "tmp.jpg", out);
-    int ret = OCR("tmp.jpg");
+    //cv::imwrite( "tmp.jpg", out);
+    int ret = OCR("tmp.jpg", out);
     return ret;
 }
 

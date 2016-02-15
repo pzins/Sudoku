@@ -1,10 +1,10 @@
 project(Sudoku)
 cmake_minimum_required(VERSION 2.8)
 
-set(CMAKE_CXX_FLAGS "-std=c++11")
-   SET(CMAKE_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_CXX_FLAGS "-std=c++11 -pg -O3")
+SET(CMAKE_BUILD_TYPE Debug)
 
-#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 aux_source_directory(. SRC_LIST)
 
 

@@ -10,6 +10,10 @@
 #include "Observer.h"
 #include "gridRecognizer.h"
 
+#define NB 9
+
+
+
 namespace Ui {
 class MainWindow;
 }
@@ -27,8 +31,7 @@ public:
 private:
     Ui::MainWindow *ui;
     QTableWidget grid;
-    QTableWidgetItem items[9][9];
-
+    QTableWidgetItem items[NB][NB];
     GridRecognizer gridRecognizer;
     SudokuSolver sudoku;
 

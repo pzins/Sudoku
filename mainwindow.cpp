@@ -8,50 +8,50 @@
 #include <QTableWidgetItem>
 #include <QFileDialog>
 
+#define ROW_HEIGHT 50
+#define COLUMN_WIDTH 50
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->verticalLayout->insertWidget(0, &grid);
-
-    grid.setColumnCount(9);
-    grid.setRowCount(9);
+    grid.setParent(this);
+    grid.setGeometry(10,10,464,464);
+    grid.setColumnCount(NB);
+    grid.setRowCount(NB);
     grid.horizontalHeader()->hide();
     grid.verticalHeader()->hide();
-    for(int i = 0; i < 9; ++i)
+    for(int i = 0; i < NB; ++i)
     {
-        grid.setRowHeight(i,50);
-        grid.setColumnWidth(i, 50);
+        grid.setRowHeight(i,ROW_HEIGHT);
+        grid.setColumnWidth(i, COLUMN_WIDTH);
     }
 
-    for(int i = 0; i < 9; i++)
-        for(int j = 0; j < 9; ++j)
+    for(int i = 0; i < NB; i++)
+        for(int j = 0; j < NB; ++j)
+        {
             grid.setItem(i,j, &items[i][j]);
+            items[i][j].setFont(QFont("Arial", 14, QFont::Bold));
+        }
 
     QObject::connect(ui->helpButton, SIGNAL(clicked()), this, SLOT(needHelp())) ;
     QObject::connect(ui->solveButton, SIGNAL(clicked()), this, SLOT(solveSudoku())) ;
     QObject::connect(ui->fileButton, SIGNAL(clicked()), this, SLOT(loadFile())) ;
 
 
-    ui->resultLabel->setVisible(false);
-    ui->resultLabel->setText("SOLVED");
-
 }
 
 void MainWindow::update()
 {
-    for(int i = 0; i < 9; ++i)
+    for(int i = 0; i < NB; ++i)
     {
-        for(int j = 0; j < 9; ++j)
+        for(int j = 0; j < NB; ++j)
         {
             items[i][j].setTextAlignment(Qt::AlignCenter);
             items[i][j].setText(QString::fromStdString(std::to_string(sudoku.getValue(j, i))));
         }
     }
-    if(sudoku.isFilled())
-        ui->resultLabel->setVisible(true);
-
 }
 
 void MainWindow::setSudokuSolver(SudokuSolver &_solver)

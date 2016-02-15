@@ -27,8 +27,8 @@ private:
     cv::Mat img;
     Grid grid;
     void removeGrid();
-    void thresholdColor();
     int compute(int _caseHeight, int _caseWidth, int _x, int _y);
+    int OCR(const std::string& _filename, cv::Mat& _img);
 
 };
 

@@ -148,9 +148,6 @@ void SudokuSolver::hideExceptOne()
 
     }while(contains(positions, x, y));
     positions.push_back({x, y});
-    print();
-    std::cout << positions.size() << std::endl;
-
     for(int i = 0; i < SIZE; ++i)
     {
         for(int j = 0; j < SIZE; ++j)
