@@ -8,7 +8,7 @@ Help : give one solution (one random number from all numbers which were not yet 
 </p>
 
 <p>
-## Dependencies
+Dependencies
 OpenCV
 Tesseract
 clone both git repo
@@ -19,7 +19,7 @@ make install : compilation + copy in the system
 </p>
 
 <p>
-##Compilation
+Compilation
 Adapt CMakeLists.txt : with correct path to tesseract and opencv
 cmake source_path
 make -j8
